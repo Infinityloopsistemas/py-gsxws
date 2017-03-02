@@ -349,13 +349,14 @@ class RepairOrReplace(Repair):
     The submissions creates a GSX RoR Repair in the system.
     """
     COVERAGE_OPTIONS = (
-        ('N',   'No Damage'),
-        ('A1',  'Battery Service'),
-        ('A2',  'Returnable Damage'),
-        ('A3',  'Non-returnable Damage'),
-        ('X',   'Non-returnable damage covered by AppleCare+'),
-        ('RPL', 'Replace'),
-        ('Z',   'Override to Out of Warranty when part is covered by Variable Warranty'),
+            ('N', 'No Damage'),
+            ('A1', 'Battery Service'),
+            ('A2', 'Returnable Damage'),
+            ('A3', 'Non-returnable Damage'),
+            ('X', 'Non-returnable damage covered by AppleCare+'),
+            ('RPL', 'Replace'),
+            ('CL', 'Valid Consumer Law Claim'),
+            ('A7', 'Display Only Service'),
     )
 
     def create(self):
@@ -380,12 +381,22 @@ class WholeUnitExchange(Repair):
 class MailInRepair(Repair):
     """
     This API allows the submission of Mail-In Repair information into GSX,
-    resulting in the creation of a GSX Mail-In Repair. 
+    resulting in the creation of a GSX Mail-In Repair.
     """
     def create(self):
         self._namespace = "asp:"
         return self._submit("repairData", "CreateMailInRepair", "repairConfirmation")
-        
+
+class DepotShipperLabel(GsxObject):
+    """
+    The Depot Shipper Label API allows ASP to Print Depot Shipper Label for
+    RepairOrReplace (whole unit mail-in) repairs.
+    """
+
+    def get_depot_shipper(self):
+        self._namespace = "asp:"
+        self._submit("depotShipperLabelRequest", "depotShipperLabelRequest", "depotShipperLabelResponse")
+        return self._req.objects        
 
 if __name__ == '__main__':
     import doctest
