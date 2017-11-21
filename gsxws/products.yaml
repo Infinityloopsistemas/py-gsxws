@@ -5,6 +5,7 @@ APPLETV:
         - "Apple TV (2nd generation)"
         - "Apple TV (3rd generation)"
         - "Apple TV (4th generation)"
+        - "Apple TV 4K"
 
 DISPLAYS:
     name: Display
@@ -52,7 +53,9 @@ IMAC:
         - "iMac (21.5-inch, Late 2015)"
         - "iMac (Retina 4K, 21.5-inch, Late 2015)"
         - "iMac (Retina 5K, 27-inch, Late 2015)"
-
+        - "iMac (21.5-inch, 2017)"
+        - "iMac (Retina 4K, 21.5-inch, 2017)"
+        - "iMac (Retina 5K, 27-inch, 2017)"
 
 IPAD:
     name: iPad
@@ -79,9 +82,17 @@ IPAD:
         - "iPad Air (Wi-Fi)"
         - "iPad Air (Wi-Fi + Cellular)"
         - "iPad Air 2"
-        - "iPad Pro"
-        - "iPad Pro (Wi-Fi)"
-        - "iPad Pro (Wi-Fi + Cellular)"
+        - "iPad Pro (12.9-inch) (Wi-Fi)"
+        - "iPad Pro (12.9-inch) (Wi-Fi + Cellular)"
+        - "iPad Pro (9.7-inch) (Wi-Fi)"
+        - "iPad Pro (9.7-inch) (Wi-Fi + Cellular)"
+        - "iPad (5th generation) (Wi-Fi)"
+        - "iPad (5th generation) (Wi-Fi + Cellular)"
+        - "iPad Pro (10.5-inch) (Wi-Fi)"
+        - "iPad Pro (10.5-inch) (Wi-Fi + Cellular)"
+        - "iPad Pro (12.9-inch) (2nd generation) (Wi-Fi)"
+        - "iPad Pro (12.9-inch) (2nd generation) (Wi-Fi + Cellular)"
+
 
 IPADACCESSORY:
     name: iPad Accessory
@@ -112,6 +123,9 @@ IPHONE:
         - "iPhone SE"
         - "iPhone 7"
         - "iPhone 7 Plus"
+        - "iPhone 8"
+        - "iPhone 8 Plus"
+        - "iPhone X"
 
 IPHONEACCESSORY:
     name: iPhone Accessory
@@ -153,6 +167,7 @@ MACACCESSORY:
         - "Apple 85W MagSafe Power Adapter"
         - "AirPort Extreme 802.11ac"
         - "AirPort Time Capsule 802.11ac"
+        - "Magic Keyboard with Numeric Keypad"
 
 IPODCLASSIC:
     name: iPod Classic
@@ -224,8 +239,8 @@ MACPRO:
         - Mac Pro (Mid 2010)
         - Mac Pro Server (Mid 2010)
         - Mac Pro (Mid 2012)
-        - Mac Pro (Late 2013)
         - Mac Pro Server (Mid 2012)
+        - Mac Pro (Late 2013)
 
 MACBOOK:
     name: MacBook
@@ -318,7 +333,12 @@ MACBOOKPRO:
         - "MacBook Pro (Retina, 15-inch, Mid 2014)"
         - "MacBook Pro (Retina, 13-inch, Early 2015)"
         - "MacBook Pro (Retina, 15-inch, Mid 2015)"
+        - "MacBook Pro (13-inch, 2016, Two Thunderbolt 3 Ports)"
+        - "MacBook Pro (13-inch, 2016, Four Thunderbolt 3 Ports)"
+        - "MacBook Pro (15-inch, 2016)"
         - "MacBook Pro (13-inch, Late 2016, Two Thunderbolt 3 Ports)"
+        - "MacBook Pro (13-inch, 2017, Four Thunderbolt 3 Ports)"
+        - "MacBook Pro (15-inch, 2017)"
 
 SERVERS:
     name: Server
@@ -389,3 +409,6 @@ WATCH:
         - "Watch Sport 42mm"
         - "Watch Edition 38mm"
         - "Watch Edition 42mm"
+        - "Apple Watch Series 1"
+        - "Apple Watch Series 2"
+        - "Apple Watch Series 3"
