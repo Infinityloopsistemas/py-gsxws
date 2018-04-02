@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import logging
 from datetime import date, datetime
 
 from unittest import TestCase, main, skip
 
-from gsxws.core import validate, GsxCache
+sys.path.append(os.path.abspath('..'))
+
+from gsxws.core import validate, GsxCache, connect
 from gsxws.objectify import parse, gsx_diags_timestamp
 from gsxws.products import Product
 from gsxws import (repairs, escalations, lookups, returns,
-                   GsxError, diagnostics, comptia,
-                   comms,)
+                   GsxError, diagnostics, comptia, products,
+                   comms, parts,)
 
 
 def empty(a):
@@ -20,7 +23,6 @@ def empty(a):
 
 class CommsTestCase(TestCase):
     def setUp(self):
-        from gsxws.core import connect
         self.priority = 'HIGH'
         self.article_id = 'SN3133'
         connect(os.getenv('GSX_USER'), os.getenv('GSX_SOLDTO'), os.getenv('GSX_ENV'))
@@ -45,7 +47,6 @@ class CommsTestCase(TestCase):
 
 class RemoteTestCase(TestCase):
     def setUp(self):
-        from gsxws.core import connect
         connect(os.getenv('GSX_USER'), os.getenv('GSX_SOLDTO'), os.getenv('GSX_ENV'))
         self.sn = os.getenv('GSX_SN')
         device = Product(sn=self.sn)
@@ -62,7 +63,7 @@ class RemoteTestCase(TestCase):
 
     def assertUnicodeOrInt(self, val):
         try:
-            self.assertIsInstance(val, unicode)
+            self.assertIsInstance(val, str)
         except AssertionError:
             self.assertIsInstance(val, int)
 
@@ -75,7 +76,6 @@ class ComptiaTestCase(RemoteTestCase):
 
 class DiagnosticsTestCase(TestCase):
     def setUp(self):
-        from gsxws.core import connect
         connect(os.getenv('GSX_USER'), os.getenv('GSX_SOLDTO'), os.getenv('GSX_ENV'))
         self.sn = os.getenv('GSX_SN')
         device = Product(sn=self.sn)
@@ -88,11 +88,11 @@ class DiagnosticsTestCase(TestCase):
         res = self.diag.fetch()
 
         for r in res.diagnosticTestData.testResult.result:
-            self.assertIsInstance(r.name, unicode)
+            self.assertIsInstance(r.name, str)
             self.assertUnicodeOrInt(r.value)
 
         for r in res.diagnosticProfileData.profile.unit.key:
-            self.assertIsInstance(r.name, unicode)
+            self.assertIsInstance(r.name, str)
             self.assertUnicodeOrInt(r.value)
 
         for r in res.diagnosticProfileData.report.reportData.key:
@@ -107,16 +107,16 @@ class DiagnosticsTestCase(TestCase):
 
     def test_fetch_dc_url(self):
         url = self.diag.fetch_dc_url()
-        self.assertRegexpMatches(url, r'^https://')
+        self.assertRegex(url, r'^https://')
 
     def test_initiate_email(self):
         self.diag.emailAddress = os.getenv('GSX_EMAIL')
         res = self.diag.initiate()
-        self.assertRegexpMatches(str(res), r'\d+')
+        self.assertRegex(str(res), r'\d+')
 
     def test_initiate_phone(self):
         self.diag.phoneNumber = os.getenv('GSX_PHONE')
-        with self.assertRaisesRegexp(GsxError, 'SMS sending is not supported'):
+        with self.assertRaisesRegex(GsxError, 'SMS sending is not supported'):
             self.diag.initiate()
 
 
@@ -155,17 +155,17 @@ class RepairTestCase(RemoteTestCase):
 
 class CoreFunctionTestCase(TestCase):
     def test_dump(self):
-        rep = repairs.Repair(blaa=u'ääöö')
+        rep = repairs.Repair(blaa='ääöö')
         part = repairs.RepairOrderLine()
         part.partNumber = '661-5571'
         rep.orderLines = [part]
-        self.assertRegexpMatches(rep.dumps(),
+        self.assertRegex(rep.dumps(),
                                  '<GsxObject><blaa>ääöö</blaa><orderLines>')
 
     def test_cache(self):
         """Make sure the cache is working."""
         c = GsxCache('test').set('spam', 'eggs')
-        self.assertEquals(c.get('spam'), 'eggs')
+        self.assertEqual(c.get('spam'), 'eggs')
 
 
 class TestTypes(TestCase):
@@ -174,7 +174,7 @@ class TestTypes(TestCase):
         self.data = parse(xml, 'lookupResponseData')
 
     def test_unicode(self):
-        self.assertIsInstance(self.data.lastModifiedBy, unicode)
+        self.assertIsInstance(self.data.lastModifiedBy, str)
 
     def test_timestamp(self):
         self.assertIsInstance(self.data.createTimestamp, datetime)
@@ -197,7 +197,7 @@ class TestErrorFunctions(TestCase):
                          'This unit is not eligible for an Onsite repair from GSX.')
 
     def test_message(self):
-        self.assertRegexpMatches(self.data.message, 'Multiple error messages exist.')
+        self.assertRegex(self.data.message, 'Multiple error messages exist.')
 
     def test_exception(self):
         msg = 'Connection failed'
@@ -207,7 +207,7 @@ class TestErrorFunctions(TestCase):
     def test_error_ca_fmip(self):
         from gsxws.core import GsxResponse
         xml = open('tests/fixtures/error_ca_fmip.xml', 'r').read()
-        with self.assertRaisesRegexp(GsxError, 'A repair cannot be created'):
+        with self.assertRaisesRegex(GsxError, 'A repair cannot be created'):
             GsxResponse(xml=xml, el_method='CreateCarryInResponse',
                         el_response='repairConfirmation')
 
@@ -276,7 +276,7 @@ class TestSympomIssueFunctions(RemoteTestCase):
     def test_issue_code(self):
         self._issues = repairs.SymptomIssue(reportedSymptomCode=self.symptom).fetch()
         self.issue = self._issues[0][0]
-        self.assertRegexpMatches(self.issue, r'[A-Z]+')
+        self.assertRegex(self.issue, r'[A-Z]+')
 
 
 class TestRepairFunctions(RepairTestCase):
@@ -367,13 +367,28 @@ class TestRepairFunctions(RepairTestCase):
 class TestPartFunction(RemoteTestCase):
     def test_product_parts(self):
         parts = Product(os.getenv('GSX_SN')).parts()
-        self.assertIsInstance(parts[0].partNumber, basestring)
+        self.assertIsInstance(parts[0].partNumber, str)
+
+
+class TestProductData(TestCase):
+    def test_models(self):
+        models = products.models()
+
+    def test_product_image(self):
+        product = Product(os.getenv('GSX_SN', '123456789'))
+        product.description = 'MacBook Air (13-inch min 2013)'
+        img = product.fetch_image('https://static.servoapp.com/images/products/macbook-air-13-inchmid-2013.jpg')
+        self.assertTrue(os.path.exists(img))
+
+    def test_part_image(self):
+        part = parts.Part(partNumber='661-1234')
+        img = part.fetch_image()
+        self.assertTrue(os.path.exists(img))
 
 
 class TestRemoteWarrantyFunctions(TestCase):
     @classmethod
     def setUpClass(cls):
-        from gsxws.core import connect
         connect(os.getenv('GSX_USER'), os.getenv('GSX_SOLDTO'), os.getenv('GSX_ENV'))
 
     def setUp(self):
@@ -580,7 +595,7 @@ class TestCarryinRepairDetail(TestCase):
         self.assertEqual(self.data.dispatchId, 'G2093174681')
 
     def test_unicode_name(self):
-        self.assertEqual(self.data.primaryAddress.firstName, u'Ääkköset')
+        self.assertEqual(self.data.primaryAddress.firstName, 'Ääkköset')
 
 
 class ConnectionTestCase(TestCase):
@@ -588,11 +603,12 @@ class ConnectionTestCase(TestCase):
 
     def test_access_denied(self):
         """Make sure we fail with 403 when connecting from non-whitelisted IP."""
-        from gsxws.core import connect
-        with self.assertRaisesRegexp(GsxError, 'Access denied'):
-            connect(os.getenv('GSX_USER'), os.getenv('GSX_SOLDTO'), os.getenv('GSX_ENV'))
+        with self.assertRaisesRegex(GsxError, 'Access denied'):
+            connect(os.getenv('GSX_USER'), os.getenv('GSX_SOLDTO'),
+                    os.getenv('GSX_ENV'))
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    GsxCache.nukeall() # to avoid pickle errors between different Python versions
     main()
