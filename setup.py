@@ -6,7 +6,7 @@ setup(
     version=VERSION,
     description="Library for communicating with GSX Web Services API.",
     long_description=open('README.rst').read(),
-    install_requires=['PyYAML', 'lxml'],
+    install_requires=['PyYAML', 'lxml', 'requests'],
     classifiers=[
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
