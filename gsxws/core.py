@@ -34,12 +34,12 @@ import hashlib
 import logging
 import requests
 import tempfile
-import objectify
 import xml.etree.ElementTree as ET
 
+from . import objectify
 from datetime import date, time, datetime, timedelta
 
-VERSION     = "0.92"
+VERSION     = "0.93"
 
 GSX_ENV     = "ut" # it, ut or pr
 GSX_LANG    = "en"
@@ -127,7 +127,7 @@ def validate(value, what=None):
     """
     result = None
 
-    if not isinstance(value, basestring):
+    if not isinstance(value, str):
         raise ValueError('%s is not valid input (%s != string)' % (value, type(value)))
 
     rex = {
@@ -142,7 +142,7 @@ def validate(value, what=None):
         'productName':      r'^i?Mac',
     }
 
-    for k, v in rex.items():
+    for k, v in list(rex.items()):
         if re.match(v, value):
             result = k
 
@@ -151,8 +151,8 @@ def validate(value, what=None):
 
 def get_format(locale=GSX_LOCALE):
     filepath = os.path.join(os.path.dirname(__file__), 'langs.json')
-    df = open(filepath, 'r')
-    return json.load(df).get(locale)
+    with open(filepath, 'r') as df:
+        return json.load(df).get(locale)
 
 
 class GsxError(Exception):
@@ -163,7 +163,7 @@ class GsxError(Exception):
         self.codes = []
         self.messages = []
 
-        if isinstance(message, basestring):
+        if isinstance(message, str):
             self.messages.append(message)
 
         if status == 403:
@@ -189,41 +189,38 @@ class GsxError(Exception):
                 self.messages.append(el.text)
 
     def __str__(self):
-        return repr(self.message)
+        return ' '.join(self.messages)
 
     @property
     def code(self):
         try:
             return self.codes[0]
         except IndexError:
-            return u'XXX'
-
-    @property
-    def message(self):
-        return unicode(self)
+            return 'XXX'
 
     @property
     def errors(self):
-        return dict(zip(self.codes, self.messages))
+        return dict(list(zip(self.codes, self.messages)))
 
     def __unicode__(self):
         if len(self.messages) < 1:
-            return u'Unknown GSX error'
+            return 'Unknown GSX error'
 
-        return u' '.join(self.messages)
+        return ' '.join(self.messages)
 
 
 class GsxCache(object):
     """The cache creates a separate shelf for each GSX session."""
 
     shelf = None
+    shelf_prefix = 'gsxws'
     tmpdir = tempfile.gettempdir()
 
     def __init__(self, key, expires=timedelta(minutes=20)):
         self.key = key
         self.expires = expires
         self.now = datetime.now()
-        self.fp = os.path.join(self.tmpdir, "gsxws_%s" % key)
+        self.fp = os.path.join(self.tmpdir, '%s_%s.db' % (self.shelf_prefix, key))
         self.shelf = shelve.open(self.fp, protocol=-1)
 
         if not self.shelf.get(key):
@@ -250,6 +247,13 @@ class GsxCache(object):
 
         self.shelf[key] = d
         return self
+
+    @classmethod
+    def nukeall(cls):
+        """Delete all gsxws caches"""
+        import subprocess
+        path = os.path.join(cls.tmpdir, cls.shelf_prefix) + '*.db'
+        subprocess.call('/bin/rm ' + path, shell=True)
 
     def nuke(self):
         """Delete this cache."""
@@ -281,7 +285,7 @@ class GsxRequest(object):
         self.body = ET.SubElement(self.env, "soapenv:Body")
         self.xml_response = ''
 
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             self.obj = v
             self._request = k
             self.data = v.to_xml(self._request)
@@ -295,7 +299,7 @@ class GsxRequest(object):
             self._url = GSX_URL.format(env=GSX_HOSTS[GSX_ENV], region=GSX_REGION)
         except KeyError:
             raise GsxError('GSX environment (%s) must be one of: %s' % (GSX_ENV,
-                           ', '.join(GSX_HOSTS.keys())))
+                           ', '.join(list(GSX_HOSTS.keys()))))
 
         logging.debug(self._url)
         logging.debug(xmldata)
@@ -376,7 +380,7 @@ class GsxRequest(object):
         return ET.tostring(self.env)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return str(self).encode('utf-8')
 
 
 class GsxResponse:
@@ -422,7 +426,7 @@ class GsxObject(object):
             if k is not None:
                 kwargs[k] = a
 
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             self.__setattr__(k, v)
 
     def __setattr__(self, name, value):
@@ -479,7 +483,7 @@ class GsxObject(object):
         <Element 'blaa' at 0x...
         """
         root = ET.Element(root)
-        for k, v in self._data.items():
+        for k, v in list(self._data.items()):
             if isinstance(v, list):
                 for e in v:
                     if isinstance(e, GsxObject):
@@ -487,7 +491,7 @@ class GsxObject(object):
                         i.extend(e.to_xml(k))
             else:
                 el = ET.SubElement(root, k)
-                if isinstance(v, basestring):
+                if isinstance(v, str):
                     el.text = v
                 if isinstance(v, GsxObject):
                     el.extend(v.to_xml(k))
@@ -523,7 +527,8 @@ class GsxSession(GsxObject):
         self._session_id = ""
 
         md5 = hashlib.md5()
-        md5.update(user_id + self.serviceAccountNo + GSX_ENV)
+        s = (user_id + self.serviceAccountNo + GSX_ENV).encode()
+        md5.update(s)
 
         self._cache_key = md5.hexdigest()
         self._cache = GsxCache(self._cache_key)

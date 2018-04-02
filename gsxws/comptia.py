@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from core import GsxObject, GsxCache
+from .core import GsxObject, GsxCache
 
 MODIFIERS = (
     ("A", "Not Applicable"),
@@ -69,9 +69,9 @@ class CompTIA(GsxObject):
 
         for el in root.findall(".//comptiaGroup"):
             group = []
-            comp_id = unicode(el[0].text)
+            comp_id = str(el[0].text)
             for ci in el.findall("comptiaCodeInfo"):
-                group.append((ci[0].text, unicode(ci[1].text)),)
+                group.append((ci[0].text, str(ci[1].text)),)
 
             self._comptia[comp_id] = group
 
@@ -88,9 +88,9 @@ class CompTIA(GsxObject):
         """
         r = dict()
 
-        for g, codes in self._comptia.items():
+        for g, codes in list(self._comptia.items()):
             r[g] = list()
-            for k, v in codes.items():
+            for k, v in list(codes.items()):
                 r[g].append((k, v,))
 
         return r[component] if component else r
@@ -104,7 +104,7 @@ def fetch():
 if __name__ == '__main__':
     import sys
     import doctest
-    from core import connect
+    from .core import connect
     logging.basicConfig(level=logging.DEBUG)
     connect(*sys.argv[1:4])
     doctest.testmod()
