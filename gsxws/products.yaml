@@ -56,6 +56,7 @@ IMAC:
         - "iMac (21.5-inch, 2017)"
         - "iMac (Retina 4K, 21.5-inch, 2017)"
         - "iMac (Retina 5K, 27-inch, 2017)"
+        - "iMac Pro (2017)"
 
 IPAD:
     name: iPad
@@ -258,6 +259,7 @@ MACBOOK:
         - "MacBook (13-inch, Mid 2010)"
         - "MacBook (Retina, 12-inch, Early 2015)"
         - "MacBook (Retina, 12-inch, Early 2016)"
+        - "MacBook (Retina, 12-inch, 2017)"
 
 MACBOOKLEGACY:
     name: MacBook (Legacy)
@@ -292,6 +294,7 @@ MACBOOKAIR:
         - "MacBook Air (13-inch, Early 2014)"
         - "MacBook Air (11-inch, Early 2015)"
         - "MacBook Air (13-inch, Early 2015)"
+        - "MacBook Air (13-inch, 2017)"
 
 MACBOOKPRO:
     name: MacBook Pro
@@ -412,3 +415,9 @@ WATCH:
         - "Apple Watch Series 1"
         - "Apple Watch Series 2"
         - "Apple Watch Series 3"
+
+AUDIO:
+    name: Audio
+    models:
+        - "AirPods"
+        - "HomePod"
