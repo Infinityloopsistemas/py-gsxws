@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from core import GsxObject
+from .core import GsxObject
 
 
 class Communication(GsxObject):
@@ -49,7 +49,7 @@ def ack(id, status):
 if __name__ == '__main__':
     import sys
     import doctest
-    from core import connect
+    from .core import connect
     logging.basicConfig(level=logging.DEBUG)
     connect(*sys.argv[1:4])
     doctest.testmod()

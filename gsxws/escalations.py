@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os.path
-from core import GsxObject
-from lookups import Lookup
+from .core import GsxObject
+from .lookups import Lookup
 
 STATUS_OPEN = 'O'
 STATUS_CLOSED = 'C'

@@ -4,8 +4,8 @@
 import sys
 import logging
 
-from core import GsxObject, GsxError, validate
-from lookups import Lookup
+from .core import GsxObject, GsxError, validate
+from .lookups import Lookup
 
 REPAIR_TYPES = (
     ('CA', 'Carry-In/Non-Replinished'),
@@ -389,7 +389,7 @@ class MailInRepair(Repair):
 
 if __name__ == '__main__':
     import doctest
-    from core import connect
+    from .core import connect
     logging.basicConfig(level=logging.DEBUG)
     connect(*sys.argv[1:])
     doctest.testmod()

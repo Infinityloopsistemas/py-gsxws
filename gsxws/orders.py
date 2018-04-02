@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from core import GsxObject
+from .core import GsxObject
 
 
 class OrderLine(GsxObject):
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     import sys
     import doctest
     import logging
-    from core import connect
+    from .core import connect
     logging.basicConfig(level=logging.DEBUG)
     connect(*sys.argv[1:5])
     doctest.testmod()

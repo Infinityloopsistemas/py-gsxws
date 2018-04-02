@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from core import GsxObject, validate
+from .core import GsxObject, validate
 
 RETURN_TYPES = (
     (1, "Dead On Arrival"),
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     import sys
     import doctest
     import logging
-    from core import connect
+    from .core import connect
     logging.basicConfig(level=logging.DEBUG)
     connect(*sys.argv[1:])
     doctest.testmod()
