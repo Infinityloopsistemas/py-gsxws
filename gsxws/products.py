@@ -4,11 +4,11 @@ https://gsxwsut.apple.com/apidocs/ut/html/WSAPIChangeLog.html?user=asp
 """
 
 import re
-import urllib
 
-from lookups import Lookup
-from diagnostics import Diagnostics
-from core import GsxObject, GsxError, validate
+from .utils import fetch_url
+from .lookups import Lookup
+from .diagnostics import Diagnostics
+from .core import GsxObject, GsxError, validate
 
 
 def models():
@@ -19,7 +19,8 @@ def models():
     import os
     import yaml
     filepath = os.path.join(os.path.dirname(__file__), "products.yaml")
-    return yaml.load(open(filepath, 'r'))
+    with open(filepath, 'r') as f:
+        return yaml.load(f)
 
 
 class Product(object):
@@ -151,7 +152,7 @@ class Product(object):
             raise GsxError("No URL to fetch product image")
 
         try:
-            return urllib.urlretrieve(url)[0]
+            return fetch_url(url)
         except Exception as e:
             raise GsxError("Failed to fetch product image: %s" % e)
 
@@ -262,7 +263,7 @@ if __name__ == '__main__':
     import sys
     import doctest
     import logging
-    from core import connect
+    from .core import connect
     logging.basicConfig(level=logging.DEBUG)
     connect(*sys.argv[1:])
     doctest.testmod()
