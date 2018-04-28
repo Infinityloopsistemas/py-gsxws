@@ -98,7 +98,7 @@ ENVIRONMENTS = (
 )
 
 GSX_HOSTS = {'pr': '', 'it': 'it', 'ut': 'ut'}
-GSX_URL = "https://gsxapi{env}.apple.com/gsx-ws/services/{region}/asp"
+GSX_URL = os.getenv('GSX_URL', "https://gsxapi{env}.apple.com/gsx-ws/services/{region}/asp")
 
 
 def validate(value, what=None):
@@ -197,6 +197,10 @@ class GsxError(Exception):
             return self.codes[0]
         except IndexError:
             return 'XXX'
+
+    @property
+    def message(self):
+        return self.messages[0]
 
     @property
     def errors(self):
@@ -367,7 +371,7 @@ class GsxRequest(object):
         logging.debug("Response: %s %s %s" % (res.status_code, res.reason, xml))
 
         if res.status_code > 200:
-            raise GsxError(xml=xml, url=self._url, status=res.status_code)
+            raise GsxError(xml=xml, url=self._url, status=res.status_code, message=res.reason)
 
         if raw is True:
             return ET.fromstring(self.xml_response)
