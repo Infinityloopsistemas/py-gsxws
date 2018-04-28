@@ -188,7 +188,7 @@ class Product(object):
         """
         Returns True if FMiP status is active, False otherwise
         """
-        return 'Find My iPhone is active' in self.fmip_status
+        return 'find my iphone is active' in self.fmip_status.lower()
 
     def is_unlocked(self, ad=None):
         """
