@@ -160,7 +160,7 @@ def parse(root, response):
     if isinstance(root, str) and os.path.exists(root):
         root = objectify.parse(root, parser)
     else:
-        root = objectify.fromstring(root.encode(), parser)
+        root = objectify.fromstring(root, parser)
 
     return root.find('*//%s' % response)
 
