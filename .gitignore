@@ -36,6 +36,7 @@ nosetests.xml
 
 .env
 .envrc
+.env2
 *.sublime-*
 
 
