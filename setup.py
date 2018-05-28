@@ -5,7 +5,7 @@ setup(
     name="gsxws",
     version=VERSION,
     description="Library for communicating with GSX Web Services API.",
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     install_requires=['PyYAML', 'lxml', 'requests'],
     classifiers=[
         "Environment :: Web Environment",
