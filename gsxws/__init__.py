@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+name = 'gsxws'
+
 from .core import *
 from .repairs import *
 from .products import *

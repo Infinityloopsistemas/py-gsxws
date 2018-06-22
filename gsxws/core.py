@@ -39,7 +39,7 @@ import xml.etree.ElementTree as ET
 from . import objectify
 from datetime import date, time, datetime, timedelta
 
-VERSION     = "0.93"
+VERSION     = "0.94"
 
 GSX_ENV     = "ut" # it, ut or pr
 GSX_LANG    = "en"
