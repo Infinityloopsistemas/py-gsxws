@@ -166,7 +166,7 @@ class CoreFunctionTestCase(TestCase):
         part = repairs.RepairOrderLine()
         part.partNumber = '661-5571'
         rep.orderLines = [part]
-        self.assertRegex(str(rep.dumps()), r'<GsxObject><blaa>ääöö</blaa><orderLines>')
+        self.assertRegex(str(rep.dumps()), '<GsxObject><blaa>ääöö</blaa><orderLines>')
 
     def test_cache(self):
         """Make sure the cache is working."""

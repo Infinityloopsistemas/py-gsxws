@@ -213,6 +213,13 @@ class GsxError(Exception):
         return ' '.join(self.messages)
 
 
+class GsxConnectionError(GsxError):
+    """A more fatal-type HTTP error."""
+    def __init__(self, url, code, message):
+        self.messages = []
+        self.messages.append('%d: %s (%s)' % (code, message, url))
+
+
 class GsxCache(object):
     """The cache creates a separate shelf for each GSX session."""
 
@@ -363,12 +370,15 @@ class GsxRequest(object):
             else:
                 request.append(self.data)
 
-        data = ET.tostring(self.env, "UTF-8")
+        data = ET.tostring(self.env, 'UTF-8')
         res = self._send(method, data)
-        xml = res.text.encode('utf-8')
+        xml = res.text.encode('utf8')
         self.xml_response = xml
 
         logging.debug("Response: %s %s %s" % (res.status_code, res.reason, xml))
+
+        if res.status_code > 400:
+            raise GsxConnectionError(self._url, res.status_code, res.reason)
 
         if res.status_code > 200:
             raise GsxError(xml=xml, url=self._url, status=res.status_code, message=res.reason)
@@ -384,7 +394,7 @@ class GsxRequest(object):
         return ET.tostring(self.env)
 
     def __str__(self):
-        return str(self).encode('utf-8')
+        return str(self).encode('utf8')
 
 
 class GsxResponse:
